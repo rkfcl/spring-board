@@ -1,6 +1,8 @@
 package com.example.StudySpring.service;
 
+import com.example.StudySpring.entity.Board;
 import com.example.StudySpring.entity.CommentEntity;
+import com.example.StudySpring.repository.BoardRepository;
 import com.example.StudySpring.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +31,7 @@ public class CommentService {
         commentRepository.deleteById(id);
     }
 
-    public Page<CommentEntity> findComments(Integer boardId, Pageable pageable){
+    public Page<CommentEntity> findPagingComments(Integer boardId, Pageable pageable){
         Page<CommentEntity> commentEntities = commentRepository.findByBoardId(boardId, pageable);
         return commentEntities;
     }
