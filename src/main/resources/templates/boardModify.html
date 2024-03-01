@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>게시글 수정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/board/list}">게시판</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search" action="/board/list" method="GET">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searchKeyword">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<form th:action="@{'/board/update/' + ${board.id}}" method="post" enctype="multipart/form-data">
+    <div class="h3 border-top border-bottom p-3 mb-0 bg-secondary text-white">
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">제목</label>
+            <input name="title" type="text" class="form-control" th:value="${board.title}" id="exampleFormControlInput1" placeholder="제목">
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">내용</label>
+            <textarea name="content" class="form-control" th:text="${board.content}" id="exampleFormControlTextarea1" rows="20" placeholder="내용"></textarea>
+        </div>
+        <div class="input-group mb-3">
+            <input type="file" name="files" class="form-control" multiple="multiple" onchange="updateFiles(this.files)">
+        </div>
+        <div id="file-list">
+
+        </div>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-light justify-md-center">수정</button>
+        </div>
+    </div>
+</form>
+
+<script>
+$.ajax({
+        type: "GET",
+        url: `/files/[[${board.id}]]`,
+        success: function (files) {
+            loadFiles(files);
+        }
+    })
+
+    function loadFiles(files) {
+        const fileList = document.getElementById('file-list');
+        for(let i=0; i<files.length; i++) {
+            const item = document.createElement('div');
+            const fileName = document.createTextNode(files[i].originalFileName);
+            const deleteButton = document.createElement('button');
+            deleteButton.addEventListener('click', (event) => {
+                item.remove();
+                event.preventDefault();
+                const deleteItem = document.createElement('input');
+                deleteItem.setAttribute("name", "deleteFilesId");
+                deleteItem.setAttribute("value", files[i].id);
+                deleteItem.setAttribute("type", "hidden");
+                fileList.appendChild(deleteItem);
+            });
+            deleteButton.innerText="X";
+            item.appendChild(fileName);
+            item.appendChild(deleteButton);
+            fileList.appendChild(item);
+        }
+    }
+let selectedFiles = [];
+    function updateFiles(files) {
+        const fileList = document.getElementById('file-list');
+        for(let i=0; i<files.length; i++) {
+            selectedFiles.push(files[i]);
+            const item = document.createElement('div');
+            const fileName = document.createTextNode(files[i].name);
+            const deleteButton = document.createElement('button');
+            deleteButton.addEventListener('click', (event) => {
+                item.remove();
+                event.preventDefault();
+                deleteFile(files[i]);
+            });
+            deleteButton.innerText="X";
+            item.appendChild(fileName);
+            item.appendChild(deleteButton);
+            fileList.appendChild(item);
+        }
+    }
+
+    function deleteFile(deleteFile) {
+        const inputFile = document.querySelector('input[name="files"]');
+        const dataTransfer = new DataTransfer();
+        selectedFiles = selectedFiles.filter(file => file!==deleteFile);
+        selectedFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        })
+        inputFile.files = dataTransfer.files;
+    }
+</script>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

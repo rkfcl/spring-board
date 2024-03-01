@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>게시판 홈</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/board/list}">게시판</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search" action="/board/list" method="GET">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searchKeyword">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary p-0">
+    <div class="container-fluid bg-dark">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active text-white " aria-current="page" href="#">전체글</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">개념글</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        등록순
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">등록순</a></li>
+                        <li><a class="dropdown-item" href="#">추천순</a></li>
+                        <li><a class="dropdown-item" href="#">댓글갯수순</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        추천순
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active text-white" aria-current="page" th:href="@{/board/write}">글쓰기</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<ul class="nav nav-tabs bg-dark text-white">
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">전체</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">게시판</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">게시판2</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+    </li>
+</ul>
+
+<div class="list-group list-group-flush">
+    <a th:each="board : ${list}" th:href="@{/board/view/{id}(id=${board.id})}" class="list-group-item list-group-item-action bg-dark text-white">
+        <div class="d-flex w-100 justify-content-start">
+            <h5 class="mb-1" th:text="${board.title}">제목</h5>
+            <span class="ms-2">[0]</span>
+        </div>
+        <div class="d-flex w-100 justify-content-between">
+            <p class="mb-1">작성자</p>
+            <small>
+                <span th:if="${#temporals.format(board.createDate, 'yyyyMMdd') eq #temporals.format(#temporals.createNow(), 'yyyyMMdd')}"
+                      th:text="${#temporals.format(board.createDate, 'HH:mm')}"></span>
+                <span th:unless="${#temporals.format(board.createDate, 'yyyyMMdd') eq #temporals.format(#temporals.createNow(), 'yyyyMMdd')}"
+                      th:text="${#temporals.format(board.createDate, 'yyyy.MM.dd')}"></span>
+                <span> | 조회 <span th:text="${board.views}"></span> | 추천 <span th:text="${board.likes}"></span></span>
+            </small>
+        </div>
+    </a>
+</div>
+<!--page-->
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item">
+            <a class="page-link" th:if="${nowPage > 0}" th:href="@{/board/list(page=${nowPage - 1},searchKeyword = ${param.searchKeyword})}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <th:block th:each="i : ${#numbers.sequence(startPage, endPage)}">
+            <li class="page-item" th:class="${nowPage == i} ? 'active' : ''">
+                <a class="page-link" th:href="@{/board/list(page=${i},searchKeyword = ${param.searchKeyword})}" th:text="${i + 1}"></a>
+            </li>
+        </th:block>
+        <li class="page-item">
+            <a class="page-link" th:if="${!list.last}" th:href="@{/board/list(page=${nowPage + 1},searchKeyword = ${param.searchKeyword})}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
