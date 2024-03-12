@@ -48,23 +48,8 @@ public class BoardService {
         }
     }
 
-    public Page<Board> boardList(Pageable pageable) {
-        return boardRepository.findAll(pageable);
-    }
-
     public Page<Board> boardSerachList(String searchKeyword, Pageable pageable) {
         return boardRepository.findByTitleContaining(searchKeyword, pageable);
-    }
-
-    public Page<Board> boardListOrderByCommentCount(Pageable pageable) {
-        return boardRepository.findAllOrderByCommentCnt(pageable);
-    }
-
-    public Page<Board> boardListOrderByCommentCountWithSearch(String searchKeyword, Pageable pageable) {
-        return boardRepository.findByTitleContainingOrderByCommentCnt(searchKeyword, pageable);
-    }
-    public Page<Board> boardListOrderByLikes(Pageable pageable) {
-        return boardRepository.findAllOrderByLikes(pageable);
     }
     public Board boardView(Integer id) {
         return boardRepository.findById(id).get();
