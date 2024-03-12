@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -50,21 +51,21 @@ public class BoardController {
     }
 
     @GetMapping("/board/list")
-    public String boardList(Model model,@PageableDefault(page = 0,size = 10,sort = "id",direction = Sort.Direction.DESC) Pageable pageable,@RequestParam(value = "searchKeyword",required = false) String searchKeyword) {
+    public String boardList(Model model, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                            @RequestParam(value = "searchKeyword", defaultValue = "") String searchKeyword,
+                            @RequestParam(value = "sort", defaultValue = "id") String sort) {
         Page<Board> boardPage = null;
-        if (searchKeyword ==null){
-            boardPage = boardService.boardList(pageable);
-        }else {
-            boardPage = boardService.boardSerachList(searchKeyword,pageable);
-        }
+        Pageable pageable1 = PageRequest.ofSize(10).withPage(0).withSort(Sort.by(Sort.Order.desc(sort),Sort.Order.desc("id")));
+        boardPage = boardService.boardSerachList(searchKeyword, pageable1);
 
         int nowPage = boardPage.getPageable().getPageNumber();
-        int startPage = Math.max(nowPage -4,0);
-        int endPage = Math.min(nowPage + 4,boardPage.getTotalPages()-1);
+        int startPage = Math.max(nowPage - 4, 0);
+        int endPage = Math.min(nowPage + 4, boardPage.getTotalPages() - 1);
+        model.addAttribute("searchKeyword", searchKeyword);
         model.addAttribute("list", boardPage);
-        model.addAttribute("nowPage",nowPage);
-        model.addAttribute("startPage",startPage);
-        model.addAttribute("endPage",endPage);
+        model.addAttribute("nowPage", nowPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
         return "boardlist";
     }
 
@@ -72,7 +73,7 @@ public class BoardController {
     public String boardView(Model model, @PathVariable("id") Integer id) {
         boardService.updateViews(id);
         List<CommentEntity> commentEntities = commentService.findCommentList(id);
-        model.addAttribute("comments",commentEntities);
+        model.addAttribute("comments", commentEntities);
         model.addAttribute("board", boardService.boardView(id));
         return "boardview";
     }
@@ -81,7 +82,7 @@ public class BoardController {
     @GetMapping("/board/delete")
     public String boardDelete(@RequestParam(name = "id") Integer id) {
         List<BoardFileEntity> fileEntityList = fileService.findByBoardId(id);
-        for (BoardFileEntity fileEntity : fileEntityList){
+        for (BoardFileEntity fileEntity : fileEntityList) {
             fileService.deleteUploadFile(fileEntity); //파일 삭제
         }
         boardService.boardDelete(id); //게시글 삭제
@@ -96,10 +97,10 @@ public class BoardController {
 
     @PostMapping("/board/update/{id}")
     public String boardUpdate(@PathVariable("id") Integer id, Board updatedBoard, Model model,
-                              @RequestParam(name = "files",required = false) List<MultipartFile> files,
-                              @RequestParam(name = "deleteFilesId",required = false) List<Integer> deleteFilesId,
+                              @RequestParam(name = "files", required = false) List<MultipartFile> files,
+                              @RequestParam(name = "deleteFilesId", required = false) List<Integer> deleteFilesId,
                               @Valid Board board, Errors errors) throws Exception {
-        if (errors.hasErrors()){
+        if (errors.hasErrors()) {
             return "boardModify";
         }
         // 삭제할 파일이 있는지 확인하고 있다면 삭제 수행
@@ -119,9 +120,10 @@ public class BoardController {
         return "message";
     }
 
-
-    @GetMapping("/board/test")
-    public String test(){
-        return "index";
+    @PostMapping("/likes/{id}")
+    @ResponseBody
+    public Integer boardLikes(@PathVariable("id") int id){
+        boardService.increaseLikes(id);
+        return boardService.boardView(id).getLikes();
     }
 }

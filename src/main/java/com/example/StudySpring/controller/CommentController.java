@@ -28,7 +28,6 @@ public class CommentController {
         commentService.write(commentEntity);
         return "redirect:/board/view/"+commentEntity.getBoardId();
     }
-
     @PostMapping("/comment/delete")
     @ResponseBody
     public String commentDelete(@RequestParam(name = "id") Integer id){

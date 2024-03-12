@@ -8,12 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,6 +56,16 @@ public class BoardService {
         return boardRepository.findByTitleContaining(searchKeyword, pageable);
     }
 
+    public Page<Board> boardListOrderByCommentCount(Pageable pageable) {
+        return boardRepository.findAllOrderByCommentCnt(pageable);
+    }
+
+    public Page<Board> boardListOrderByCommentCountWithSearch(String searchKeyword, Pageable pageable) {
+        return boardRepository.findByTitleContainingOrderByCommentCnt(searchKeyword, pageable);
+    }
+    public Page<Board> boardListOrderByLikes(Pageable pageable) {
+        return boardRepository.findAllOrderByLikes(pageable);
+    }
     public Board boardView(Integer id) {
         return boardRepository.findById(id).get();
     }
@@ -76,5 +88,17 @@ public class BoardService {
         Board board = boardRepository.findById(id).get();
         int commentCnt = board.getCommentCnt();
         board.setCommentCnt(commentCnt-1);
+    }
+    @Transactional
+    public void increaseLikes(Integer id) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if (optionalBoard.isPresent()) {
+            Board board = optionalBoard.get();
+            int currentLikes = board.getLikes();
+            board.setLikes(currentLikes + 1);
+            boardRepository.save(board);
+        } else {
+            // 게시물을 찾지 못한 경우 처리할 내용을 추가하세요.
+        }
     }
 }
