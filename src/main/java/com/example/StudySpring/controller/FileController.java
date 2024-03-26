@@ -66,6 +66,24 @@ public class FileController {
         }
     }
 
+    @GetMapping("/upload/{name}")
+    public void viewFile(@PathVariable("name") String name, HttpServletResponse response) throws IOException {
+        String filePath = "C:/springboot_img/";
+
+        // 실제 파일 경로 설정
+        File file = new File(filePath + name);
+
+        if (file.exists()) {
+            // 파일이 존재하는 경우, 파일 내용을 클라이언트에게 반환
+            response.setContentType("image/jpeg"); // 이미지 타입에 맞게 Content-Type 설정
+            FileInputStream fis = new FileInputStream(file);
+            IOUtils.copy(fis, response.getOutputStream());
+            fis.close();
+        } else {
+            // 파일이 존재하지 않는 경우, 404 오류 반환
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
 
     @GetMapping("/files/{id}")
     public List<BoardFileEntity> findFiles(@PathVariable("id") Integer id) throws IOException {

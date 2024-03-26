@@ -2,8 +2,10 @@ package com.example.StudySpring.service;
 
 import com.example.StudySpring.entity.Board;
 import com.example.StudySpring.entity.BoardFileEntity;
+import com.example.StudySpring.entity.User;
 import com.example.StudySpring.repository.BoardFileRepository;
 import com.example.StudySpring.repository.BoardRepository;
+import com.example.StudySpring.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,10 +24,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
-
     private final BoardFileRepository boardFileRepository;
+    private final UserRepository userRepository;
 
-    public void boardWrite(Board board, List<MultipartFile> files) throws Exception {
+    public void save(Board board,String username, List<MultipartFile> files) throws Exception {
+        User user = userRepository.findByUsername(username);
+        board.setUser(user);
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
                 UUID uuid = UUID.randomUUID();

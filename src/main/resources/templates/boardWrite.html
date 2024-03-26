@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="utf-8">
@@ -49,10 +49,30 @@
                         name="searchKeyword">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
+                <div class="d-flex align-items-center">
+                    <!-- 로그인 버튼 -->
+                    <a class="btn btn-outline-success mx-2" th:href="@{/account/login}"
+                        sec:authorize="!isAuthenticated()">Login</a>
+                    <!-- 회원가입 버튼 -->
+                    <a class="btn btn-outline-success me-2" th:href="@{/account/register}"
+                        sec:authorize="!isAuthenticated()">Register</a>
+
+                    <!-- 로그아웃 폼 -->
+                    <form class="d-flex align-items-center" th:action="@{/logout}" method="post"
+                        sec:authorize="isAuthenticated()">
+                        <!-- 사용자 이름 -->
+                        <span class="text-white mx-2" sec:authentication="name">사용자</span>
+                        <!-- 사용자 권한 -->
+                        <span class="text-white me-2" sec:authentication="principal.authorities">권한</span>
+                        <!-- 로그아웃 버튼 -->
+                        <button class="btn btn-outline-success" type="submit">Logout</button>
+                    </form>
+                </div>
+
             </div>
         </div>
     </nav>
-    <form action="/board/writepro" method="post" enctype="multipart/form-data">
+    <form action="/board/write" method="post" enctype="multipart/form-data">
         <div class="h3 border-top border-bottom p-3 mb-0 bg-secondary text-white">
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">제목</label>

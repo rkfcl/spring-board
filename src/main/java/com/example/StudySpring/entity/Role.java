@@ -1,22 +1,21 @@
 package com.example.StudySpring.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Data
-@Table(name = "comment")
-public class CommentEntity extends TimeEntity{
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer boardId;
-    private String contents;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    private String name;
+
+    @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    private User user;
+    private List<User> users;
 }

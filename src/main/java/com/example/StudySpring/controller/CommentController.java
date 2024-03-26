@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +24,10 @@ public class CommentController {
     private final CommentService commentService;
     private final BoardService boardService;
     @PostMapping("/comment/write")
-    public String commentWrite(CommentEntity commentEntity, Model model){
+    public String commentWrite(CommentEntity commentEntity, Authentication authentication, Model model){
+        String username = authentication.getName();
         boardService.incrementCommentCnt(commentEntity.getBoardId());
-        commentService.write(commentEntity);
+        commentService.write(commentEntity,username);
         return "redirect:/board/view/"+commentEntity.getBoardId();
     }
     @PostMapping("/comment/delete")

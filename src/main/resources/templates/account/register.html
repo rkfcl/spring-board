@@ -16,16 +16,10 @@
 <body class="d-flex align-items-center py-4 bg-body-tertiary">
 
     <main class="text-center form-signin w-100 m-auto">
-        <form th:action="@{/account/login}" method="post">
+        <form th:action="@{/account/register}" method="post">
             <a href="/board/list"><img class="mb-4 rounded" th:src="@{/img/갈치.jpg}" alt="" width="72" height="57"></a>
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-            <div class="alert alert-danger" role="alert" th:if="${param.error}">
-                Invalid username and password.
-            </div>
-            <div class="alert alert-primary" role="alert" th:if="${param.logout}">
-                You have been logged out.
-            </div>
-
+            <h1 class="h3 mb-3 fw-normal">회원가입</h1>
+            
             <div class="form-floating">
                 <input type="text" class="form-control" id="username" name="username" placeholder="Username">
                 <label for="username">Username</label>
@@ -42,7 +36,7 @@
             <!--                    Remember me-->
             <!--                </label>-->
             <!--            </div>-->
-            <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+            <button class="btn btn-primary w-100 py-2" type="submit">회원가입</button>
             <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
         </form>
     </main>

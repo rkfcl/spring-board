@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,15 +24,17 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/board/list").permitAll()
+                        .requestMatchers("/", "/account/register" ,"/css/**", "/files/**", "/board/list", "/img/**","/error","/api/**").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .formLogin((form) -> form
                         .loginPage("/account/login")
+                        .defaultSuccessUrl("/board/list")
                         .permitAll()
                 )
                 .logout((logout) -> logout.permitAll());
-
+        http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
     @Autowired
@@ -41,12 +44,12 @@ public class WebSecurityConfig {
                 .dataSource(dataSource)
                 .passwordEncoder(passwordEncoder())
                 .usersByUsernameQuery("select username, password, enabled "
-                        + "from users "
+                        + "from user "
                         + "where username = ?")
-                .authoritiesByUsernameQuery("select username, name "
+                .authoritiesByUsernameQuery("select u.username, r.name "
                         + "from user_role ur inner join user u on ur.user_id = u.id "
-                        + "inner join role r on ur.role = r.id "
-                        + "where email = ?");
+                        + "inner join role r on ur.role_id = r.id "
+                        + "where u.username = ?");
     }
 
     @Bean

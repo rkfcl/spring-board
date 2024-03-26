@@ -6,6 +6,7 @@ import com.example.StudySpring.entity.CommentEntity;
 import com.example.StudySpring.service.BoardService;
 import com.example.StudySpring.service.CommentService;
 import com.example.StudySpring.service.FileService;
+import com.example.StudySpring.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -29,22 +31,21 @@ public class BoardController {
     private final BoardService boardService;
     private final FileService fileService;
     private final CommentService commentService;
-
     @GetMapping("/board/write")
     public String boardWriteForm() {
 
         return "boardWrite";
     }
 
-    @PostMapping("/board/writepro")
-    public String boardWritePro(Board board, Model model, @RequestParam(name = "files", required = false) List<MultipartFile> files) throws Exception {
+    @PostMapping("/board/write")
+    public String postBoard(Board board, Model model, @RequestParam(name = "files", required = false) List<MultipartFile> files, Authentication authentication) throws Exception {
         if (board.getTitle().isEmpty() || board.getContent().isEmpty()) {
             model.addAttribute("message", "제목 또는 내용을 입력해야 합니다.");
             model.addAttribute("url", "/board/write");
             return "message";
         }
-
-        boardService.boardWrite(board, files);
+        String username = authentication.getName();
+        boardService.save(board,username, files);
         model.addAttribute("message", "글 작성이 완료되었습니다.");
         model.addAttribute("url", "/board/list");
         return "message";
@@ -113,7 +114,8 @@ public class BoardController {
         boardTemp.setTitle(updatedBoard.getTitle());
         boardTemp.setContent(updatedBoard.getContent());
         boardTemp.setModifiedDate(LocalDateTime.now());
-        boardService.boardWrite(boardTemp, files);
+        String username = board.getUser().getUsername();
+        boardService.save(boardTemp,username, files);
 
         model.addAttribute("message", "글 수정이 완료되었습니다.");
         model.addAttribute("url", "/board/view/" + id);

@@ -2,8 +2,10 @@ package com.example.StudySpring.service;
 
 import com.example.StudySpring.entity.Board;
 import com.example.StudySpring.entity.CommentEntity;
+import com.example.StudySpring.entity.User;
 import com.example.StudySpring.repository.BoardRepository;
 import com.example.StudySpring.repository.CommentRepository;
+import com.example.StudySpring.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
-    public Integer write(CommentEntity commentEntity){
+    public void write(CommentEntity commentEntity,String username){
+        User user = userRepository.findByUsername(username);
+        commentEntity.setUser(user);
         commentRepository.save(commentEntity);
-        return commentEntity.getId();
     }
 
     public List<CommentEntity> findCommentList(Integer boardID){
