@@ -7,7 +7,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "board_file_table")
-public class BoardFileEntity extends TimeEntity {
+public class BoardFile extends TimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -19,11 +19,11 @@ public class BoardFileEntity extends TimeEntity {
     @JsonBackReference
     private Board board;
 
-    public static BoardFileEntity toBoardFileEntity(Board board, String originalFileName, String storedFileName){
-        BoardFileEntity boardFileEntity = new BoardFileEntity();
-        boardFileEntity.setOriginalFileName(originalFileName);
-        boardFileEntity.setStoredFileName(storedFileName);
-        boardFileEntity.setBoard(board);
-        return boardFileEntity;
+    public static BoardFile toBoardFileEntity(Board board, String originalFileName, String storedFileName){
+        BoardFile boardFile = new BoardFile();
+        boardFile.setOriginalFileName(originalFileName);
+        boardFile.setStoredFileName(storedFileName);
+        boardFile.setBoard(board);
+        return boardFile;
     }
 }

@@ -4,6 +4,8 @@ import com.example.StudySpring.entity.Role;
 import com.example.StudySpring.entity.User;
 import com.example.StudySpring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,4 +27,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Integer getId(Authentication authentication){
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        User currentUser = userRepository.findByUsername(username);
+        return currentUser.getId();
+    }
 }

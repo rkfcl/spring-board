@@ -1,7 +1,6 @@
 package com.example.StudySpring.controller;
 
-import com.example.StudySpring.entity.Board;
-import com.example.StudySpring.entity.BoardFileEntity;
+import com.example.StudySpring.entity.BoardFile;
 import com.example.StudySpring.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -30,7 +29,7 @@ public class FileController {
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("id") Integer id) throws MalformedURLException {
         // 파일 정보 가져오기
-        BoardFileEntity file = fileService.file(id);
+        BoardFile file = fileService.file(id);
 
         // 파일 경로 설정
         String filePath = "C:/springboot_img/" + file.getStoredFileName();
@@ -86,8 +85,8 @@ public class FileController {
     }
 
     @GetMapping("/files/{id}")
-    public List<BoardFileEntity> findFiles(@PathVariable("id") Integer id) throws IOException {
-        List<BoardFileEntity> fileEntities = fileService.findByBoardId(id);
+    public List<BoardFile> findFiles(@PathVariable("id") Integer id) throws IOException {
+        List<BoardFile> fileEntities = fileService.findByBoardId(id);
         return fileEntities;
     }
 }

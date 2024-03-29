@@ -1,16 +1,14 @@
 package com.example.StudySpring.service;
 
 import com.example.StudySpring.entity.Board;
-import com.example.StudySpring.entity.BoardFileEntity;
+import com.example.StudySpring.entity.BoardFile;
 import com.example.StudySpring.entity.User;
 import com.example.StudySpring.repository.BoardFileRepository;
 import com.example.StudySpring.repository.BoardRepository;
 import com.example.StudySpring.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,11 +38,11 @@ public class BoardService {
                 board.setFileAttached(1);
                 boardRepository.save(board);
 
-                BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, file.getOriginalFilename(), fileName);
-                boardFileRepository.save(boardFileEntity);
+                BoardFile boardFile = BoardFile.toBoardFileEntity(board, file.getOriginalFilename(), fileName);
+                boardFileRepository.save(boardFile);
             } else {
-                List<BoardFileEntity> boardFileEntityList = board.getBoardFileEntityList();
-                if (boardFileEntityList.isEmpty()||boardFileEntityList==null) {
+                List<BoardFile> boardFileList = board.getBoardFileList();
+                if (boardFileList.isEmpty()|| boardFileList ==null) {
                     board.setFileAttached(0);
                 }else board.setFileAttached(1);
                 boardRepository.save(board);

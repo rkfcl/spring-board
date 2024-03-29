@@ -1,9 +1,7 @@
 package com.example.StudySpring.service;
 
-import com.example.StudySpring.entity.Board;
-import com.example.StudySpring.entity.CommentEntity;
+import com.example.StudySpring.entity.Comment;
 import com.example.StudySpring.entity.User;
-import com.example.StudySpring.repository.BoardRepository;
 import com.example.StudySpring.repository.CommentRepository;
 import com.example.StudySpring.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,24 +17,24 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    public void write(CommentEntity commentEntity,String username){
+    public void write(Comment comment, String username){
         User user = userRepository.findByUsername(username);
-        commentEntity.setUser(user);
-        commentRepository.save(commentEntity);
+        comment.setUser(user);
+        commentRepository.save(comment);
     }
 
-    public List<CommentEntity> findCommentList(Integer boardID){
+    public List<Comment> findCommentList(Integer boardID){
         return  commentRepository.findByBoardId(boardID);
     }
-    public CommentEntity findComment(Integer id){
+    public Comment findComment(Integer id){
         return commentRepository.findById(id).get();
     }
     public void deleteComment(Integer id){
         commentRepository.deleteById(id);
     }
 
-    public Page<CommentEntity> findPagingComments(Integer boardId, Pageable pageable){
-        Page<CommentEntity> commentEntities = commentRepository.findByBoardId(boardId, pageable);
+    public Page<Comment> findPagingComments(Integer boardId, Pageable pageable){
+        Page<Comment> commentEntities = commentRepository.findByBoardId(boardId, pageable);
         return commentEntities;
     }
 }

@@ -1,27 +1,35 @@
 package com.example.StudySpring.controller;
 
 import com.example.StudySpring.entity.Board;
-import com.example.StudySpring.entity.BoardFileEntity;
-import com.example.StudySpring.entity.CommentEntity;
+import com.example.StudySpring.entity.BoardFile;
+import com.example.StudySpring.entity.Comment;
+import com.example.StudySpring.entity.User;
+import com.example.StudySpring.repository.BoardRepository;
+import com.example.StudySpring.repository.UserRepository;
 import com.example.StudySpring.service.BoardService;
 import com.example.StudySpring.service.CommentService;
 import com.example.StudySpring.service.FileService;
 import com.example.StudySpring.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,6 +39,9 @@ public class BoardController {
     private final BoardService boardService;
     private final FileService fileService;
     private final CommentService commentService;
+    private final UserService userService;
+    private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
     @GetMapping("/board/write")
     public String boardWriteForm() {
 
@@ -73,7 +84,7 @@ public class BoardController {
     @GetMapping("/board/view/{id}")
     public String boardView(Model model, @PathVariable("id") Integer id) {
         boardService.updateViews(id);
-        List<CommentEntity> commentEntities = commentService.findCommentList(id);
+        List<Comment> commentEntities = commentService.findCommentList(id);
         model.addAttribute("comments", commentEntities);
         model.addAttribute("board", boardService.boardView(id));
         return "boardview";
@@ -81,9 +92,17 @@ public class BoardController {
 
 
     @GetMapping("/board/delete")
-    public String boardDelete(@RequestParam(name = "id") Integer id) {
-        List<BoardFileEntity> fileEntityList = fileService.findByBoardId(id);
-        for (BoardFileEntity fileEntity : fileEntityList) {
+    public String boardDelete(@RequestParam(name = "id") Integer id,Model model, Authentication authentication) {
+        Board board = boardService.boardView(id);
+        Integer userId = userService.getId(authentication);
+        if (board.getUser().getId() != userId){
+            model.addAttribute("message", "글 삭제 권한이 없습니다.");
+            model.addAttribute("url", "/board/view/"+id);
+            return "message";
+        }
+
+        List<BoardFile> fileEntityList = fileService.findByBoardId(id);
+        for (BoardFile fileEntity : fileEntityList) {
             fileService.deleteUploadFile(fileEntity); //파일 삭제
         }
         boardService.boardDelete(id); //게시글 삭제

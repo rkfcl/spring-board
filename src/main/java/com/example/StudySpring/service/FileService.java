@@ -1,9 +1,8 @@
 package com.example.StudySpring.service;
 
-import com.example.StudySpring.entity.BoardFileEntity;
+import com.example.StudySpring.entity.BoardFile;
 import com.example.StudySpring.repository.BoardFileRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -15,15 +14,15 @@ import java.util.Optional;
 public class FileService {
     private final BoardFileRepository boardFileRepository;
 
-    public BoardFileEntity file(Integer id){
+    public BoardFile file(Integer id){
         return boardFileRepository.findById(id).get();
     }
 
-    public List<BoardFileEntity> findByBoardId(Integer id){
+    public List<BoardFile> findByBoardId(Integer id){
         return boardFileRepository.findByBoardId(id);
     }
 
-    public void deleteUploadFile(BoardFileEntity boardFile){
+    public void deleteUploadFile(BoardFile boardFile){
         // 파일 경로 설정
         String fullPath = "C:/springboot_img/" + boardFile.getStoredFileName();
         File file = new File(fullPath);
@@ -33,7 +32,7 @@ public class FileService {
     }
 
     public void deleteFile(Integer fileId) {
-        Optional<BoardFileEntity> fileEntity = boardFileRepository.findById(fileId);
+        Optional<BoardFile> fileEntity = boardFileRepository.findById(fileId);
         String storedFileName = fileEntity.get().getStoredFileName();
         String fullPath = "C:/springboot_img/" + storedFileName;
         File file = new File(fullPath);

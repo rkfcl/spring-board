@@ -18,6 +18,7 @@ public class User {
     private String password;
     private boolean enabled;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_role",
@@ -25,6 +26,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Board> boards = new ArrayList<>();
 }

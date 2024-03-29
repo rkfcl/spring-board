@@ -1,14 +1,13 @@
 package com.example.StudySpring.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
 @Table(name = "comment")
-public class CommentEntity extends TimeEntity{
+public class Comment extends TimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -17,6 +16,5 @@ public class CommentEntity extends TimeEntity{
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User user;
 }

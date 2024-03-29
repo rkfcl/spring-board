@@ -31,7 +31,7 @@ public class Board extends TimeEntity {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<BoardFileEntity> boardFileEntityList = new ArrayList<>();
+    private List<BoardFile> boardFileList = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
