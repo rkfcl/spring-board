@@ -37,4 +37,10 @@ public class CommentService {
         Page<Comment> commentEntities = commentRepository.findByBoardId(boardId, pageable);
         return commentEntities;
     }
+
+    public void updateComment(Integer id, String contents) {
+        Comment comment = commentRepository.findById(id).get();
+        comment.setContents(contents);
+        commentRepository.save(comment);
+    }
 }

@@ -147,4 +147,9 @@ public class BoardController {
         boardService.increaseLikes(id);
         return boardService.boardView(id).getLikes();
     }
+
+    @GetMapping("/test")
+    public String test(){
+        return "test";
+    }
 }

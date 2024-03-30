@@ -158,11 +158,11 @@
                 <img th:src="@{/img/chatboexs.png}" width="30px" height="30px">
                 댓글
             </div>
-            <div class="list-area h4 border-top m-3 bg-dark text-white border">
+            <div class="list-area h4 border-top m-3 bg-dark text-white">
                 <div class="comment-wrapper">
                     <div class="comment-item">
                         <div class="content">
-                            <div id="message" ></div>
+                            <div id="message"></div>
                         </div>
                     </div>
                 </div>
@@ -196,6 +196,14 @@
 
 
     <script th:inline="javascript">
+        function toggleEditForm() {
+            var editFormDropdown = document.getElementById('editFormDropdown');
+            if (editFormDropdown.style.display === 'none') {
+                editFormDropdown.style.display = 'block';
+            } else {
+                editFormDropdown.style.display = 'none';
+            }
+        }
 
         function likePost() {
             let boardId = [[${ board.id }]];
@@ -221,43 +229,62 @@
         }
 
         function loadComments(boardId, page) {
-    $.ajax({
-        type: "GET",
-        url: `/comment?boardId=${boardId}&page=${page}`,
-        success: function (data) {
-            let userId = data.userId;
-            let commentUl = $("#message");
-            commentUl.empty(); // 선택 요소 비우는 작업
+            $.ajax({
+                type: "GET",
+                url: `/comment/list?boardId=${boardId}&page=${page}`,
+                success: function (data) {
+                    let userId = data.userId;
+                    let commentUl = $("#message");
+                    commentUl.empty(); // 선택 요소 비우는 작업
 
-            makePagination(boardId, data.comments);
-            data.comments.content.forEach(function (comment) {
-                let commentUsername = comment.user ? comment.user.username : 'Unknown';
-                let date = comment.createDate.split('T')[0];
-                let time = comment.createDate.split('T')[1];
-                let removeButton = userId === comment.user.id ? `<button onclick="removeComment(${comment.boardId}, ${comment.id})">삭제</button>` : '';
+                    makePagination(boardId, data.comments);
+                    data.comments.content.forEach(function (comment) {
+                        let commentUsername = comment.user ? comment.user.username : 'Unknown';
+                        let date = comment.createDate.split('T')[0];
+                        let time = comment.createDate.split('T')[1];
+                        let removeButton = userId === comment.user.id ? `<button onclick="removeComment(${comment.boardId}, ${comment.id})">삭제</button>` : '';
+                        let editButton = userId === comment.user.id ? `<button onclick="toggleEditForm(${comment.id})">수정</button>` : '';
 
-                let commentHtml = `<div class="info bg-secondary border-bottom fs-5">
-                                        <div class="p-1 d-flex justify-content-between">
-                                            <div>
-                                                <span>${commentUsername}</span>
+                        let commentHtml = `
+                                    <div class="p-2">
+                                        <div class="border">
+                                            <div class="info bg-secondary border-bottom fs-5">
+                                                <div class="p-1 d-flex justify-content-between">
+                                                    <div>
+                                                        <span>${commentUsername}</span>
+                                                    </div>
+                                                    <div>
+                                                    <span>${date + " " + time}</span>
+                                                    ${removeButton ? '<span> | </span>' + removeButton : ''}
+                                                    ${editButton ? '<span> | </span>' + editButton : ''}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <span>${date + " " + time}</span>
-                                                ${removeButton ? '<span> | </span>' + removeButton : ''}
+                                            <div class="p-1">
+                                                <div class="message fs-4">${comment.contents}</div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="p-1">
-                                        <div class="message fs-4">${comment.contents}</div>
-                                    </div>`;
-                commentUl.append(commentHtml);
+                                    <div id="editForm_${comment.id}" class="p-2" style="display: none;">
+                                        <div class="input-group-text bg-dark text-white">
+                                            <span>댓글 수정&nbsp;&nbsp;${commentUsername}</span >
+                                        </div>
+                                        <div class="reply-form-textarea-wrapper" style="position: relative;">
+                                            <textarea id="editCommentContent_${comment.id}" type="text" name="contents" class="form-control bg-dark text-white" required="required" placeholder="내용">${comment.contents}</textarea>
+                                            <div class="reply-form__submit-button-wrapper" style="position: absolute; bottom: 0; right: 0;">
+                                                <button class="reply-form__submit-button" type="submit" onclick="submitEditedComment(${comment.id},${comment.boardId})" tabindex="104">작성</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    `;
+                        commentUl.append(commentHtml);
+                    })
+                },
+                error: function () {
+                    alert("error");
+                }
             })
-        },
-        error: function () {
-            alert("error");
         }
-    })
-}
 
         function makePagination(boardId, page) {
             let pagination = $("#pagination");
@@ -306,6 +333,38 @@
 
             loadComments(boardId, 0);
         }
+
+        // 댓글 수정 폼 제출 처리
+        function submitEditedComment(commentId,boardId) {
+            // 폼 데이터 가져오기
+            let content = $("#editCommentContent_" + commentId).val();
+
+            // 서버로 수정된 내용 전송
+            $.ajax({
+                type: "PUT",
+                url: `/comment/modify/${commentId}`, // 수정된 댓글을 업데이트하는 엔드포인트
+                contentType: "application/json",
+                data: JSON.stringify({ content: content }), // JSON 형태로 데이터 전송
+                success: function (response) {
+                    loadComments(boardId, 0);
+                },
+                error: function () {
+                    alert("댓글 수정에 실패했습니다.");
+                }
+            });
+        }
+
+
+
+        function toggleEditForm(commentId) {
+                var editForm = document.getElementById('editForm_' + commentId);
+                if (editForm.style.display === 'none') {
+                    editForm.style.display = 'block';
+                } else {
+                    editForm.style.display = 'none';
+                }
+            }
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
